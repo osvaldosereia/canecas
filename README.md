@@ -1,24 +1,41 @@
 # Canecas
 
-Loja mobile-first para escolher modelos oficiais, personalizar canecas brancas 11 oz com IA e acompanhar o pedido.
+Loja mobile-first para escolher modelos oficiais e personalizar uma caneca branca de 11 oz com IA.
 
-## Entregue nesta primeira versão
+## Implementado
 
-- feed responsivo de modelos oficiais;
-- busca e filtros por categoria;
-- interações de curtir, salvar, compartilhar e comentar;
-- fluxo demonstrativo de personalização com nome, frase e contato;
-- estados de geração e aprovação da prévia;
-- painel administrativo com pedidos, fila da IA e aprovação de modelos;
-- três artes originais otimizadas para demonstração.
+- feed responsivo com busca e filtros;
+- ações funcionais de curtir, salvar e compartilhar;
+- áreas reais de modelos salvos e pedidos;
+- personalização com nome, frase e contato;
+- API segura para o webhook do Make, sem expor segredos no navegador;
+- callback assíncrono para receber a arte quadrada e o mockup da caneca;
+- persistência das solicitações no banco D1;
+- modo de demonstração automático enquanto o webhook não está configurado;
+- painel administrativo protegido, com navegação e revisão de modelos funcionais.
 
-## Próximas integrações
+Os comentários públicos e o envio de artes por clientes ficaram fora desta fase para reduzir moderação, direitos autorais e funções que não ajudam diretamente a compra.
 
-- Firebase Authentication, Firestore e Storage;
-- webhook assíncrono do Make para personalização com OpenAI;
-- Mercado Pago;
-- Melhor Envio e entrega local;
-- autenticação e proteção do painel administrativo.
+## Integração com o Make
+
+Configure as variáveis descritas em `.env.example` apenas no ambiente de execução. O site envia ao Make:
+
+- referência do modelo oficial;
+- nome e frase personalizados;
+- dados do cliente;
+- prompt pronto para gerar a arte quadrada e o mockup de uma caneca branca 11 oz;
+- URL de callback e autenticação compartilhada.
+
+O Make deve responder imediatamente com um `jobId` ou com as URLs prontas. Para o fluxo assíncrono, deve chamar o callback recebido no payload com:
+
+```json
+{
+  "status": "ready",
+  "jobId": "identificador-no-make",
+  "artImageUrl": "https://.../arte-quadrada.png",
+  "mugMockupUrl": "https://.../mockup-caneca.png"
+}
+```
 
 ## Desenvolvimento
 
@@ -29,11 +46,11 @@ npm ci
 npm run dev
 ```
 
-Validações disponíveis:
+Validações:
 
 ```bash
 npm run lint
 npm test
 ```
 
-As credenciais das integrações não devem ser incluídas no repositório. Elas serão configuradas apenas no ambiente de execução.
+Próximas integrações: pagamento, cálculo de frete e conversão da prévia aprovada em pedido pago.
