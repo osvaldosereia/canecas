@@ -44,6 +44,8 @@ export function safeOrder(row: Record<string, unknown>) {
     shippingMinDays: row.shippingMinDays,
     shippingMaxDays: row.shippingMaxDays,
     checkoutUrl: row.checkoutUrl,
+    trackingCode: row.trackingCode,
+    trackingUrl: row.trackingUrl,
     mode: row.mode,
     createdAt: row.createdAt,
   };

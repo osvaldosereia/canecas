@@ -12,7 +12,8 @@ Loja mobile-first para escolher modelos oficiais e personalizar uma caneca branc
 - callback assíncrono para receber a arte quadrada e o mockup da caneca;
 - persistência das solicitações no banco D1;
 - modo de demonstração automático enquanto o webhook não está configurado;
-- painel administrativo protegido, com navegação e revisão de modelos funcionais.
+- painel administrativo protegido e conectado aos pedidos e personalizações reais;
+- indicadores operacionais, busca, filtros, mudança de etapa, observações e rastreio;
 - cálculo de frete com retirada local e integração preparada para o Melhor Envio;
 - criação de pedido e Checkout Pro do Mercado Pago;
 - retorno de pagamento e Webhook autenticado para atualizar o pedido.

@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 
 export type Quote = { id: string; name: string; company: string; priceCents: number; minDays: number | null; maxDays: number | null; mode: "live" | "demo"; pickup?: boolean };
-export type CreatedOrder = { id: string; token: string; status: string; paymentStatus: string; quantity: number; unitPriceCents: number; subtotalCents: number; shippingPriceCents: number; totalCents: number; shippingServiceName: string; shippingCompany: string; checkoutUrl?: string | null; mode: "live" | "demo"; createdAt: string };
+export type CreatedOrder = { id: string; token: string; status: string; paymentStatus: string; quantity: number; unitPriceCents: number; subtotalCents: number; shippingPriceCents: number; totalCents: number; shippingServiceName: string; shippingCompany: string; checkoutUrl?: string | null; trackingCode?: string | null; trackingUrl?: string | null; mode: "live" | "demo"; createdAt: string };
 
 const money = (cents: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 

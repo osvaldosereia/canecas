@@ -62,6 +62,9 @@ export async function ensureDatabase() {
       payment_preference_id TEXT,
       payment_id TEXT,
       checkout_url TEXT,
+      tracking_code TEXT NOT NULL DEFAULT '',
+      tracking_url TEXT NOT NULL DEFAULT '',
+      admin_notes TEXT NOT NULL DEFAULT '',
       mode TEXT NOT NULL DEFAULT 'demo',
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -69,4 +72,12 @@ export async function ensureDatabase() {
     binding.prepare("CREATE INDEX IF NOT EXISTS orders_status_idx ON orders (status, created_at)"),
     binding.prepare("CREATE INDEX IF NOT EXISTS orders_personalization_idx ON orders (personalization_id)"),
   ]);
+  for (const statement of [
+    "ALTER TABLE orders ADD COLUMN tracking_code TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE orders ADD COLUMN tracking_url TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''",
+  ]) {
+    try { await binding.prepare(statement).run(); }
+    catch (error) { if (!String(error).toLowerCase().includes("duplicate column")) throw error; }
+  }
 }
