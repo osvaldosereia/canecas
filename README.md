@@ -13,6 +13,9 @@ Loja mobile-first para escolher modelos oficiais e personalizar uma caneca branc
 - persistência das solicitações no banco D1;
 - modo de demonstração automático enquanto o webhook não está configurado;
 - painel administrativo protegido, com navegação e revisão de modelos funcionais.
+- cálculo de frete com retirada local e integração preparada para o Melhor Envio;
+- criação de pedido e Checkout Pro do Mercado Pago;
+- retorno de pagamento e Webhook autenticado para atualizar o pedido.
 
 Os comentários públicos e o envio de artes por clientes ficaram fora desta fase para reduzir moderação, direitos autorais e funções que não ajudam diretamente a compra.
 
@@ -53,4 +56,12 @@ npm run lint
 npm test
 ```
 
-Próximas integrações: pagamento, cálculo de frete e conversão da prévia aprovada em pedido pago.
+## Pagamento e frete
+
+O preço, o CEP de origem e as credenciais ficam somente nas variáveis de ambiente. Sem credenciais, a interface usa valores de demonstração e cria o pedido sem realizar cobrança.
+
+O Checkout Pro mantém os dados de cartão fora do site. O Webhook do Mercado Pago valida a assinatura, consulta o pagamento na API e confere moeda, valor e referência antes de marcar um pedido como pago.
+
+O Melhor Envio recebe o CEP de destino e as dimensões da caneca branca 11 oz. O valor selecionado é recalculado no servidor durante a criação do pedido para impedir alteração pelo navegador.
+
+Próximos passos: cadastrar as credenciais de teste, executar compras de homologação e integrar a compra/impressão das etiquetas após o pagamento aprovado.
