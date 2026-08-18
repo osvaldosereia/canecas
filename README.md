@@ -13,6 +13,8 @@ Loja mobile-first para escolher modelos oficiais e personalizar uma caneca branc
 - persistência das solicitações no banco D1;
 - modo de demonstração automático enquanto o webhook não está configurado;
 - painel administrativo protegido e conectado aos pedidos e personalizações reais;
+- biblioteca dinâmica de modelos com fila de revisão, publicação e pausa pelo admin;
+- endpoint autenticado para a automação do Make enviar novas artes ao feed;
 - indicadores operacionais, busca, filtros, mudança de etapa, observações e rastreio;
 - cálculo de frete com retirada local e integração preparada para o Melhor Envio;
 - criação de pedido e Checkout Pro do Mercado Pago;
@@ -41,6 +43,22 @@ O Make deve responder imediatamente com um `jobId` ou com as URLs prontas. Para 
 }
 ```
 
+## Entrada de novos modelos
+
+O cenário que cria artes oficiais deve enviar `POST /api/models/ingest` com `Authorization: Bearer <MODEL_FEED_WEBHOOK_SECRET>`. Cada arte entra como “Aguardando revisão” e só aparece no feed depois de aprovada no admin.
+
+```json
+{
+  "sourceJobId": "make-123",
+  "title": "Amor que acolhe",
+  "category": "Família",
+  "tags": ["amor", "família", "presente"],
+  "imageUrl": "https://.../arte-quadrada.png",
+  "phrase": "Amor que acolhe",
+  "accent": "rose"
+}
+```
+
 ## Desenvolvimento
 
 Requer Node.js 22.13 ou superior.
@@ -65,4 +83,4 @@ O Checkout Pro mantém os dados de cartão fora do site. O Webhook do Mercado Pa
 
 O Melhor Envio recebe o CEP de destino e as dimensões da caneca branca 11 oz. O valor selecionado é recalculado no servidor durante a criação do pedido para impedir alteração pelo navegador.
 
-Próximos passos: cadastrar as credenciais de teste, executar compras de homologação e integrar a compra/impressão das etiquetas após o pagamento aprovado.
+Próximos passos: cadastrar as credenciais de teste, conectar o cenário gerador de modelos, executar compras de homologação e integrar a compra/impressão das etiquetas após o pagamento aprovado.

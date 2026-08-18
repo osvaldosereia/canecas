@@ -1,6 +1,22 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+export const models = sqliteTable("models", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  sourceJobId: text("source_job_id").unique(),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  tags: text("tags").notNull().default("[]"),
+  imageUrl: text("image_url").notNull().default(""),
+  phrase: text("phrase").notNull(),
+  accent: text("accent").notNull().default("blue"),
+  status: text("status").notNull().default("review"),
+  likes: integer("likes").notNull().default(0),
+  uses: integer("uses").notNull().default(0),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const personalizations = sqliteTable("personalizations", {
   id: text("id").primaryKey(),
   publicToken: text("public_token").notNull().unique(),

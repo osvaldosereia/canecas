@@ -22,6 +22,13 @@
       "when": 1787058786581,
       "tag": "0002_optimal_blink",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1787060576565,
+      "tag": "0003_salty_cloak",
+      "breakpoints": true
     }
   ]
 }

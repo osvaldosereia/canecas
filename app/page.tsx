@@ -2,24 +2,15 @@
 
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { PublicModel as Model, starterModels } from "../lib/models";
 import CheckoutForm, { CreatedOrder } from "./CheckoutForm";
 
-type Model = { id: number; title: string; category: string; tags: string[]; image: string; likes: number; uses: number; accent: string; phrase: string };
 type View = "discover" | "saved" | "orders";
 type JobStatus = "queued" | "processing" | "ready" | "demo_ready" | "failed";
 type Job = { id: string; token: string; status: JobStatus; mode: "live" | "demo"; artImageUrl?: string | null; mugMockupUrl?: string | null; error?: string | null };
 type OrderDraft = { id: string; token: string; modelTitle: string; status: string; totalCents: number; createdAt: string };
 
-const models: Model[] = [
-  { id: 1, title: "Onde há amor, há lar", category: "Família", tags: ["amor", "casa", "presente"], image: "/models/modelo-floral.webp", likes: 284, uses: 91, accent: "coral", phrase: "Onde há amor, há lar" },
-  { id: 2, title: "Leve a vida no seu ritmo", category: "Mato Grosso", tags: ["capivara", "pantanal", "humor"], image: "/models/modelo-pantanal.webp", likes: 516, uses: 167, accent: "sage", phrase: "Leve a vida no seu ritmo" },
-  { id: 3, title: "Deus cuida de cada detalhe", category: "Fé", tags: ["fé", "católica", "presente"], image: "/models/modelo-fe.webp", likes: 391, uses: 133, accent: "blue", phrase: "Deus cuida de cada detalhe" },
-  { id: 4, title: "Professora que inspira", category: "Profissões", tags: ["professora", "gratidão", "escola"], image: "", likes: 228, uses: 74, accent: "lavender", phrase: "Professora que inspira todos os dias" },
-  { id: 5, title: "Mãe, meu lugar favorito", category: "Mães", tags: ["mãe", "afeto", "flores"], image: "", likes: 633, uses: 208, accent: "rose", phrase: "Mãe, você é meu lugar favorito" },
-  { id: 6, title: "Café primeiro, decisões depois", category: "Humor", tags: ["café", "humor", "rotina"], image: "", likes: 472, uses: 156, accent: "coffee", phrase: "Café primeiro, decisões depois" },
-];
-
-const categories = ["Para você", "Novidades", "Mais usados", "Mães", "Família", "Fé", "Humor", "Profissões", "Mato Grosso"];
+const baseCategories = ["Para você", "Novidades", "Mais usados", "Mães", "Família", "Fé", "Humor", "Profissões", "Mato Grosso"];
 
 const icon = (name: "heart" | "bookmark" | "share" | "search" | "sparkles" | "orders" | "close") => {
   const paths = {
@@ -122,6 +113,7 @@ function CustomizeSheet({ model, onClose, onApproved }: { model: Model; onClose:
 }
 
 export default function Home() {
+  const [models, setModels] = useState<Model[]>(starterModels);
   const [view, setView] = useState<View>("discover");
   const [activeCategory, setActiveCategory] = useState("Para você");
   const [query, setQuery] = useState("");
@@ -129,8 +121,26 @@ export default function Home() {
   const [savedIds, setSavedIds] = useState<number[]>([]);
   const [orders, setOrders] = useState<OrderDraft[]>([]);
   const [notice, setNotice] = useState("");
+  useEffect(() => {
+    let active = true;
+    fetch("/api/models", { cache: "no-store" }).then(response => response.ok ? response.json() : Promise.reject()).then((payload: { models?: Model[] }) => {
+      if (active && payload.models?.length) setModels(payload.models);
+    }).catch(() => { /* mantém os modelos iniciais se o catálogo estiver indisponível */ });
+    return () => { active = false; };
+  }, []);
   useEffect(() => { if (!notice) return; const timer = window.setTimeout(() => setNotice(""), 2400); return () => window.clearTimeout(timer); }, [notice]);
-  const filtered = useMemo(() => models.filter(model => { const categoryMatch = activeCategory === "Para você" || activeCategory === "Novidades" || activeCategory === "Mais usados" || model.category === activeCategory; const text = `${model.title} ${model.category} ${model.tags.join(" ")}`.toLowerCase(); return categoryMatch && text.includes(query.toLowerCase()); }), [activeCategory, query]);
+  const categories = useMemo(() => [...baseCategories, ...new Set(models.map(model => model.category).filter(category => !baseCategories.includes(category)))], [models]);
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    const matches = models.filter(model => {
+      const categoryMatch = ["Para você", "Novidades", "Mais usados"].includes(activeCategory) || model.category === activeCategory;
+      const text = `${model.title} ${model.category} ${model.tags.join(" ")}`.toLowerCase();
+      return categoryMatch && text.includes(normalizedQuery);
+    });
+    if (activeCategory === "Novidades") return matches.toSorted((a, b) => b.id - a.id);
+    if (activeCategory === "Mais usados") return matches.toSorted((a, b) => b.uses - a.uses);
+    return matches;
+  }, [activeCategory, models, query]);
   const visibleModels = view === "saved" ? models.filter(model => savedIds.includes(model.id)) : filtered;
   const changeView = (next: View) => { setView(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const toggleSaved = (id: number) => setSavedIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);

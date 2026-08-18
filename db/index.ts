@@ -14,6 +14,22 @@ export async function getDb() {
 export async function ensureDatabase() {
   const binding = await getBinding();
   await binding.batch([
+    binding.prepare(`CREATE TABLE IF NOT EXISTS models (
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      source_job_id TEXT UNIQUE,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL,
+      tags TEXT NOT NULL DEFAULT '[]',
+      image_url TEXT NOT NULL DEFAULT '',
+      phrase TEXT NOT NULL,
+      accent TEXT NOT NULL DEFAULT 'blue',
+      status TEXT NOT NULL DEFAULT 'review',
+      likes INTEGER NOT NULL DEFAULT 0,
+      uses INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`),
+    binding.prepare("CREATE INDEX IF NOT EXISTS models_status_idx ON models (status, created_at)"),
     binding.prepare(`CREATE TABLE IF NOT EXISTS personalizations (
       id TEXT PRIMARY KEY NOT NULL,
       public_token TEXT NOT NULL UNIQUE,
@@ -71,6 +87,14 @@ export async function ensureDatabase() {
     )`),
     binding.prepare("CREATE INDEX IF NOT EXISTS orders_status_idx ON orders (status, created_at)"),
     binding.prepare("CREATE INDEX IF NOT EXISTS orders_personalization_idx ON orders (personalization_id)"),
+  ]);
+  await binding.batch([
+    binding.prepare("INSERT OR IGNORE INTO models (id, title, category, tags, image_url, phrase, accent, status, likes, uses) VALUES (1, ?, ?, ?, ?, ?, ?, 'published', 284, 91)").bind("Onde há amor, há lar", "Família", '["amor","casa","presente"]', "/models/modelo-floral.webp", "Onde há amor, há lar", "coral"),
+    binding.prepare("INSERT OR IGNORE INTO models (id, title, category, tags, image_url, phrase, accent, status, likes, uses) VALUES (2, ?, ?, ?, ?, ?, ?, 'published', 516, 167)").bind("Leve a vida no seu ritmo", "Mato Grosso", '["capivara","pantanal","humor"]', "/models/modelo-pantanal.webp", "Leve a vida no seu ritmo", "sage"),
+    binding.prepare("INSERT OR IGNORE INTO models (id, title, category, tags, image_url, phrase, accent, status, likes, uses) VALUES (3, ?, ?, ?, ?, ?, ?, 'published', 391, 133)").bind("Deus cuida de cada detalhe", "Fé", '["fé","católica","presente"]', "/models/modelo-fe.webp", "Deus cuida de cada detalhe", "blue"),
+    binding.prepare("INSERT OR IGNORE INTO models (id, title, category, tags, image_url, phrase, accent, status, likes, uses) VALUES (4, ?, ?, ?, '', ?, ?, 'published', 228, 74)").bind("Professora que inspira", "Profissões", '["professora","gratidão","escola"]', "Professora que inspira todos os dias", "lavender"),
+    binding.prepare("INSERT OR IGNORE INTO models (id, title, category, tags, image_url, phrase, accent, status, likes, uses) VALUES (5, ?, ?, ?, '', ?, ?, 'published', 633, 208)").bind("Mãe, meu lugar favorito", "Mães", '["mãe","afeto","flores"]', "Mãe, você é meu lugar favorito", "rose"),
+    binding.prepare("INSERT OR IGNORE INTO models (id, title, category, tags, image_url, phrase, accent, status, likes, uses) VALUES (6, ?, ?, ?, '', ?, ?, 'published', 472, 156)").bind("Café primeiro, decisões depois", "Humor", '["café","humor","rotina"]', "Café primeiro, decisões depois", "coffee"),
   ]);
   for (const statement of [
     "ALTER TABLE orders ADD COLUMN tracking_code TEXT NOT NULL DEFAULT ''",
